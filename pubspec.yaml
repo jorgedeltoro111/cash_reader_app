@@ -39,6 +39,7 @@ dependencies:
   google_mlkit_image_labeling: ^0.12.1
   path_provider: ^2.1.4
   image: ^4.2.0
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
