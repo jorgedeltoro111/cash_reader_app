@@ -13,7 +13,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,20 +35,95 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+class FinanceScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Finanzas'),
+      ),
+      body: Center(
+        child: Text('Welcome to the Finance Screen!'),
+      ),
+    );
+  }
+}
+
+class SettingsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Configuración'),
+      ),
+      body: Center(
+        child: Text('Welcome to the Settings Screen!'),
+      ),
+    );
+  }
+}
+
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int _currentIndex = 0;
+
+  final List<Widget> _widgetOptions = [
+    DetectorScreen(), // Pantalla principal con la funcionalidad de detección
+    FinanceScreen(),  // Pantalla de finanzas
+    SettingsScreen(), // Pantalla de configuración
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.lightBlueAccent.shade400,
+        title: Text("Cash Reader App"),
+      ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _widgetOptions, // Aquí las pantallas se renderizan según el índice
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.camera_alt),
+            label: 'Detector',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            label: 'Finanzas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Configuración',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DetectorScreen extends StatefulWidget {
+  @override
+  _DetectorScreenState createState() => _DetectorScreenState();
+}
+
+class _DetectorScreenState extends State<DetectorScreen> {
   File? image;
   late ImagePicker imagePicker;
   late ImageLabeler imageLabeler;
+  String results = "";
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     imagePicker = ImagePicker();
-    //ImageLabelerOptions options = 
-    //ImageLabelerOptions(confidenceThreshold: 0.5);
-    //labeler = ImageLabeler(options: options);
     loadModel();
   }
 
@@ -64,134 +138,118 @@ class _MyHomePageState extends State<MyHomePage> {
 
   chooseImage() async {
     XFile? selectedImage =
-        await imagePicker.pickImage(source: ImageSource.gallery);
+    await imagePicker.pickImage(source: ImageSource.gallery);
     if (selectedImage != null) {
-      image = File(selectedImage.path);
-      performedImageLabeling();
       setState(() {
-        image;
+        image = File(selectedImage.path);
+        performedImageLabeling();
       });
     }
   }
 
   captureImage() async {
     XFile? selectedImage =
-        await imagePicker.pickImage(source: ImageSource.camera);
+    await imagePicker.pickImage(source: ImageSource.camera);
     if (selectedImage != null) {
-      image = File(selectedImage.path);
-      performedImageLabeling();
       setState(() {
-        image;
+        image = File(selectedImage.path);
+        performedImageLabeling();
       });
     }
   }
 
-  String results = "";
-
   performedImageLabeling() async {
-    InputImage inputImage = InputImage.fromFile(image!);
+    if (image == null) return;
 
+    InputImage inputImage = InputImage.fromFile(image!);
     final List<ImageLabel> labels = await imageLabeler.processImage(inputImage);
     results = "";
 
     for (ImageLabel label in labels) {
       final String text = label.label;
-      final int index = label.index;
       final double confidence = label.confidence;
-      print(text);
       results += "$text      ${confidence.toStringAsFixed(2)}\n";
     }
 
-    setState(() {
-      results;
-    });
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    setState(() {});
   }
 
   Future<String> getModelPath(String asset) async {
-  final path = '${(await getApplicationSupportDirectory()).path}/$asset';
-  await Directory(dirname(path)).create(recursive: true);
-  final file = File(path);
-  if (!await file.exists()) {
-    final byteData = await rootBundle.load(asset);
-    await file.writeAsBytes(byteData.buffer
-            .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+    final path = '${(await getApplicationSupportDirectory()).path}/$asset';
+    await Directory(dirname(path)).create(recursive: true);
+    final file = File(path);
+    if (!await file.exists()) {
+      final byteData = await rootBundle.load(asset);
+      await file.writeAsBytes(byteData.buffer
+          .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+    }
+    return file.path;
   }
-  return file.path;
-}
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlueAccent.shade400,
-        title: Text("Cash Reader App"),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Card(
-                color: Colors.grey,
-                margin: EdgeInsets.all(10),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 2,
-                  child: image == null
-                      ? Icon(
-                          Icons.image_outlined,
-                          size: 150,
-                        )
-                      : Image.file(image!),
-                ),
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Card(
+              color: Colors.grey,
+              margin: EdgeInsets.all(10),
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height / 2,
+                child: image == null
+                    ? Icon(
+                  Icons.image_outlined,
+                  size: 150,
+                )
+                    : Image.file(image!),
               ),
-              Card(
-                margin: EdgeInsets.all(10),
-                color: Colors.lightBlueAccent.shade400,
-                child: Container(
-                  height: 100,
-                  child: Row(
-                    children: [
-                      InkWell(
-                        child: Icon(
-                          Icons.image,
-                          size: 50,
-                        ),
-                        onTap: () {
-                          chooseImage();
-                        },
+            ),
+            Card(
+              margin: EdgeInsets.all(10),
+              color: Colors.lightBlueAccent.shade400,
+              child: Container(
+                height: 100,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    InkWell(
+                      child: Icon(
+                        Icons.image,
+                        size: 50,
                       ),
-                      InkWell(
-                        child: Icon(
-                          Icons.camera,
-                          size: 50,
-                        ),
-                        onTap: () {
-                          captureImage();
-                        },
-                      )
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  ),
+                      onTap: () {
+                        chooseImage();
+                      },
+                    ),
+                    InkWell(
+                      child: Icon(
+                        Icons.camera,
+                        size: 50,
+                      ),
+                      onTap: () {
+                        captureImage();
+                      },
+                    ),
+                  ],
                 ),
               ),
-              Card(
-                color: Colors.black,
-                child: Container(
-                  child: Text(results, style: TextStyle(fontSize: 24, color: Colors.white),),
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.all(10),
+            ),
+            Card(
+              color: Colors.black,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  results.isEmpty ? 'Resultados' : results,
+                  style: TextStyle(fontSize: 24, color: Colors.white),
                 ),
-                margin: EdgeInsets.all(10),
-              )
-            ],
-          ),
+              ),
+              margin: EdgeInsets.all(10),
+            ),
+          ],
         ),
       ),
     );
