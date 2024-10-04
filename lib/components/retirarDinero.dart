@@ -22,16 +22,42 @@ class _RetirarDineroState extends State<RetirarDinero> {
   }
 
   // Cascarón de la función para manejar el retiro de dinero (sin lógica de backend)
-  void retirarDinero(double monto, String concepto) {
-    if (monto != 0) {
-      print('Monto de $monto gastado');
-      print('Concepto: $concepto');
-      setState(() {
-        _isOpen = true;
-        _montoController.clear();
-        _conceptoController.clear();
-      });
-      // Aquí el equipo de backend implementará la lógica para enviar la solicitud
+  void retirarDinero() async {
+    final monto = double.tryParse(_montoController.text);
+    final concepto = _conceptoController.text;
+
+    if (monto != null && monto != 0) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final idUsuario = prefs.getInt('idUsuario'); // Obtener idUsuario de SharedPreferences
+
+        final response = await http.post(
+          Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/gasto.php?action=registrarGasto'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'idUsuario': idUsuario,
+            'concepto': concepto,
+            'monto': monto,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['mensaje'] == "Gasto registrado con éxito") {
+            print("Gasto registrado con éxito");
+            setState(() {
+              _montoController.clear();
+              _conceptoController.clear();
+            });
+          } else {
+            print("Error al registrar el gasto");
+          }
+        }
+      } catch (error) {
+        print('Error al registrar el gasto: $error');
+      }
     } else {
       print('No hay dinero que gastar');
     }
