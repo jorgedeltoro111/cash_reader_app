@@ -18,18 +18,34 @@ class _ConsultarSaldoState extends State<ConsultarSaldo> {
   }
 
   // Función temporal para simular la obtención de datos (sin backend)
-  void obtenerDatos() {
-    setState(() {
-      saldo = 5000.0; // Saldo simulado
-      ingresos = [
-        {"concepto": "Salario", "monto": 3000},
-        {"concepto": "Venta", "monto": 2000},
-      ];
-      gastos = [
-        {"concepto": "Renta", "monto": 1500},
-        {"concepto": "Comida", "monto": 500},
-      ];
-    });
+  void obtenerDatos() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final idUsuario = prefs.getInt('idUsuario'); // Obtener idUsuario de SharedPreferences
+
+      final response = await http.get(
+        Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/balance.php?action=obtenerBalance'),
+        headers: {
+          'Content-Type': 'application/json',
+          'idUsuario': idUsuario.toString(), // Enviar idUsuario en los headers
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['mensaje'] == "Balance obtenido con éxito") {
+          setState(() {
+            saldo = data['balance'];
+            ingresos = data['ingresos'] ?? [];
+            gastos = data['gastos'] ?? [];
+          });
+        } else {
+          print("Error al obtener el balance");
+        }
+      }
+    } catch (error) {
+      print('Error al obtener el balance: $error');
+    }
   }
 
   @override
