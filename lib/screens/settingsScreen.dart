@@ -71,15 +71,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final idUsuario = prefs.getInt('idUsuario'); // Obtener idUsuario de SharedPreferences
 
       final response = await http.post(
-        Uri.parse('https://cashviewer.000webhostapp.com/access/usuario.php?action=actualizarUsuario'),
+        Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/usuario.php?action=actualizarUsuario'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
+          'idUsuario': idUsuario,
           'numeroCelular': numeroCelular,
           'contrasenia': nuevaContrasenia,
         }),
