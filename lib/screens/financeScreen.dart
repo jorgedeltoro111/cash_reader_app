@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/login.dart'; // Importa el componente Login
 import '../components/ingresarDinero.dart';
 import '../components/retirarDinero.dart';
+import '../components/consultarSaldo.dart';
 class FinanceScreen extends StatefulWidget {
   @override
   _FinanceScreenState createState() => _FinanceScreenState();
@@ -77,7 +78,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
               margin: EdgeInsets.symmetric(vertical: 10),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/consultarDinero');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ConsultarSaldo()), // Navegación directa
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(200, 50),
