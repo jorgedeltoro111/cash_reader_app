@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'screens/financeScreen.dart';
+import 'screens/settingsScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,20 +35,6 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class SettingsScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Configuración'),
-      ),
-      body: Center(
-        child: Text('Welcome to the Settings Screen!'),
-      ),
-    );
-  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
