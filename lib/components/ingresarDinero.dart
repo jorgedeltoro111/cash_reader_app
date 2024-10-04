@@ -12,15 +12,42 @@ class _IngresarDineroState extends State<IngresarDinero> {
   bool _isOpen = false;
 
   // Función temporal sin lógica de backend
-  void agregarDinero(double monto, String concepto) {
-    if (monto != 0) {
-      print('Monto de $monto agregado');
-      print('Concepto: $concepto');
-      setState(() {
-        _isOpen = true;
-        _montoController.clear();
-        _conceptoController.clear();
-      });
+  void agregarDinero() async {
+    final monto = double.tryParse(_montoController.text);
+    final concepto = _conceptoController.text;
+
+    if (monto != null && monto != 0) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final idUsuario = prefs.getInt('idUsuario'); // Obtener idUsuario de SharedPreferences
+
+        final response = await http.post(
+          Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/ingreso.php?action=registrarIngreso'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'idUsuario': idUsuario,
+            'concepto': concepto,
+            'monto': monto,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['mensaje'] == "Ingreso registrado con éxito") {
+            print("Ingreso registrado con éxito");
+            setState(() {
+              _montoController.clear();
+              _conceptoController.clear();
+            });
+          } else {
+            print("Error al registrar el ingreso");
+          }
+        }
+      } catch (error) {
+        print('Error al registrar el ingreso: $error');
+      }
     } else {
       print('No hay dinero que ingresar');
     }
