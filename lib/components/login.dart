@@ -23,7 +23,7 @@ class _LoginState extends State<Login> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://cashviewer.000webhostapp.com/access/usuario.php?action=iniciarSesion'),
+        Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/usuario.php?action=iniciarSesion'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'numeroCelular': numeroCelular, 'contrasenia': contrasenia}),
       );
@@ -31,7 +31,7 @@ class _LoginState extends State<Login> {
 
       if (data['mensaje'] == "Inicio de sesión exitoso") {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', data['token']);
+        await prefs.setInt('idUsuario', data['idUsuario']); // Almacenar idUsuario en SharedPreferences
         widget.onLogin();
       } else {
         print("Usuario no existe");
