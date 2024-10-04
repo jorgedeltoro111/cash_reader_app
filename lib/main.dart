@@ -99,6 +99,7 @@ class _DetectorScreenState extends State<DetectorScreen> {
     super.initState();
     imagePicker = ImagePicker();
     loadModel();
+    captureImage(); // Abre la cámara al iniciar la pantalla
   }
 
   loadModel() async {
@@ -110,20 +111,8 @@ class _DetectorScreenState extends State<DetectorScreen> {
     imageLabeler = ImageLabeler(options: options);
   }
 
-  chooseImage() async {
-    XFile? selectedImage =
-    await imagePicker.pickImage(source: ImageSource.gallery);
-    if (selectedImage != null) {
-      setState(() {
-        image = File(selectedImage.path);
-        performedImageLabeling();
-      });
-    }
-  }
-
   captureImage() async {
-    XFile? selectedImage =
-    await imagePicker.pickImage(source: ImageSource.camera);
+    XFile? selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
     if (selectedImage != null) {
       setState(() {
         image = File(selectedImage.path);
@@ -175,9 +164,9 @@ class _DetectorScreenState extends State<DetectorScreen> {
                 height: MediaQuery.of(context).size.height / 2,
                 child: image == null
                     ? Icon(
-                  Icons.image_outlined,
-                  size: 150,
-                )
+                        Icons.image_outlined,
+                        size: 150,
+                      )
                     : Image.file(image!),
               ),
             ),
@@ -186,28 +175,14 @@ class _DetectorScreenState extends State<DetectorScreen> {
               color: Colors.lightBlueAccent.shade400,
               child: Container(
                 height: 100,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    InkWell(
-                      child: Icon(
-                        Icons.image,
-                        size: 50,
-                      ),
-                      onTap: () {
-                        chooseImage();
-                      },
-                    ),
-                    InkWell(
-                      child: Icon(
-                        Icons.camera,
-                        size: 50,
-                      ),
-                      onTap: () {
-                        captureImage();
-                      },
-                    ),
-                  ],
+                child: InkWell(
+                  child: Icon(
+                    Icons.camera,
+                    size: 50,
+                  ),
+                  onTap: () {
+                    captureImage(); // El botón tomará una nueva foto
+                  },
                 ),
               ),
             ),
