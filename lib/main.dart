@@ -112,7 +112,7 @@ class _DetectorScreenState extends State<DetectorScreen> {
 
   captureImage() async {
     XFile? selectedImage =
-        await imagePicker.pickImage(source: ImageSource.camera);
+    await imagePicker.pickImage(source: ImageSource.camera);
     if (selectedImage != null) {
       setState(() {
         image = File(selectedImage.path);
@@ -164,9 +164,9 @@ class _DetectorScreenState extends State<DetectorScreen> {
                 height: MediaQuery.of(context).size.height / 2,
                 child: image == null
                     ? Icon(
-                        Icons.image_outlined,
-                        size: 150,
-                      )
+                  Icons.image_outlined,
+                  size: 150,
+                )
                     : Image.file(image!),
               ),
             ),
@@ -178,14 +178,20 @@ class _DetectorScreenState extends State<DetectorScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    InkWell(
-                      child: Icon(
-                        Icons.camera,
-                        size: 50,
+                    Semantics(
+                      label: 'Botón de captura de billete',  // Texto leído por TalkBack y VoiceOver
+                      button: true,  // Indica que es un botón
+                      enabled: true,  // Asegura que se indique que está habilitado
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.camera,
+                          size: 50,
+                        ),
+                        onPressed: () {
+                          captureImage();
+                        },
+                        tooltip: 'Capturar billete',  // Descripción adicional si el Semantics no se lee
                       ),
-                      onTap: () {
-                        captureImage();
-                      },
                     ),
                   ],
                 ),
