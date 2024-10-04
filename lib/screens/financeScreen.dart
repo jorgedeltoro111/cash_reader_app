@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../components/login.dart'; // Importa el componente Login
-
+import '../components/ingresarDinero.dart';
 class FinanceScreen extends StatefulWidget {
   @override
   _FinanceScreenState createState() => _FinanceScreenState();
@@ -30,7 +30,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
               margin: EdgeInsets.symmetric(vertical: 10), // Agrega margen alrededor del botón
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/ingresarDinero');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => IngresarDinero()), // Navegación directa
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(200, 50),
