@@ -90,13 +90,45 @@ class _LoginState extends State<Login> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(15),
+                    minimumSize: Size(200, 50),
+                    padding: EdgeInsets.all(16),
+                    backgroundColor: Colors.green, // Padding para el botón
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                       side: BorderSide(color: Colors.black, width: 2),
                     ),
                   ),
-                  child: Text("Registrar", style: TextStyle(fontSize: 17)),
+                  child: Text(
+                      "Registrar",
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: Colors.black,
+                      )
+                  ),
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    // Lógica para cerrar el modal
+                    Navigator.pop(context);
+                    isModalOpen = false;
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(200, 50),
+                    padding: EdgeInsets.all(16),
+                    backgroundColor: Colors.red,// Padding para el botón
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      side: BorderSide(color: Colors.black, width: 2),
+                    ),
+                  ),
+                  child: Text(
+                      "Cerrar",
+                      style: TextStyle(
+                          fontSize: 17,
+                          color: Colors.black,
+                      )
+                  ),
                 ),
               ],
             ),
@@ -140,24 +172,41 @@ class _LoginState extends State<Login> {
         ElevatedButton(
           onPressed: handleButtonPress,
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(15),
+            minimumSize: Size(200, 50),
+            padding: EdgeInsets.all(16),
+            backgroundColor: Colors.green,// Padding para el botón
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
               side: BorderSide(color: Colors.black, width: 2),
             ),
           ),
-          child: Text("Ingresar", style: TextStyle(fontSize: 17)),
+          child: Text(
+              "Ingresar",
+              style: TextStyle(
+                  fontSize: 17,
+                  color: Colors.black,
+              )
+          ),
         ),
+        SizedBox(height: 10),
         ElevatedButton(
           onPressed: openModal, // Aquí abrimos el modal
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(15),
+            minimumSize: Size(200, 50),
+            padding: EdgeInsets.all(16),
+            backgroundColor: Colors.blueAccent, // Padding para el botón
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
               side: BorderSide(color: Colors.black, width: 2),
             ),
           ),
-          child: Text("Registrarse", style: TextStyle(fontSize: 17)),
+          child: Text(
+              "Registrarse",
+              style: TextStyle(
+                  fontSize: 17,
+                  color: Colors.black,
+              ),
+          ),
         ),
       ],
     );
