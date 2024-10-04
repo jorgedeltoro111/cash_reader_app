@@ -99,7 +99,6 @@ class _DetectorScreenState extends State<DetectorScreen> {
     super.initState();
     imagePicker = ImagePicker();
     loadModel();
-    captureImage(); // Abre la cámara al iniciar la pantalla
   }
 
   loadModel() async {
@@ -112,7 +111,8 @@ class _DetectorScreenState extends State<DetectorScreen> {
   }
 
   captureImage() async {
-    XFile? selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
+    XFile? selectedImage =
+        await imagePicker.pickImage(source: ImageSource.camera);
     if (selectedImage != null) {
       setState(() {
         image = File(selectedImage.path);
@@ -175,14 +175,19 @@ class _DetectorScreenState extends State<DetectorScreen> {
               color: Colors.lightBlueAccent.shade400,
               child: Container(
                 height: 100,
-                child: InkWell(
-                  child: Icon(
-                    Icons.camera,
-                    size: 50,
-                  ),
-                  onTap: () {
-                    captureImage(); // El botón tomará una nueva foto
-                  },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      child: Icon(
+                        Icons.camera,
+                        size: 50,
+                      ),
+                      onTap: () {
+                        captureImage();
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
