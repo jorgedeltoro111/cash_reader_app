@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'modalExito.dart'; // Componente ModalExito
 
 class RetirarDinero extends StatefulWidget {
@@ -29,39 +34,50 @@ class _RetirarDineroState extends State<RetirarDinero> {
     if (monto != null && monto != 0) {
       try {
         final prefs = await SharedPreferences.getInstance();
-        final idUsuario = prefs.getInt('idUsuario'); // Obtener idUsuario de SharedPreferences
+        final token = prefs.getString('token'); // Obtener el token de SharedPreferences
+
+        if (token == null) {
+          print('Error: token no encontrado');
+          return;
+        }
 
         final response = await http.post(
-          Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/gasto.php?action=registrarGasto'),
+          Uri.parse('http://54.159.207.236/gasto.php?action=registrarGasto'),
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token', // Asegúrate de incluir el token en las cabeceras
           },
           body: jsonEncode({
-            'idUsuario': idUsuario,
             'concepto': concepto,
             'monto': monto,
           }),
         );
 
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-          if (data['mensaje'] == "Gasto registrado con éxito") {
+          if (data['mensaje'] == "Gasto registrado con exito") {
             print("Gasto registrado con éxito");
             setState(() {
               _montoController.clear();
               _conceptoController.clear();
             });
           } else {
-            print("Error al registrar el gasto");
+            print("Error al registrar el gasto respuesta: ${data['mensaje']}");
           }
+        } else {
+          print("Error al registrar el gasto backend: ${response.statusCode}");
         }
       } catch (error) {
-        print('Error al registrar el gasto: $error');
+        print('Error al registrar el gasto app: $error');
       }
     } else {
       print('No hay dinero que gastar');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +126,7 @@ class _RetirarDineroState extends State<RetirarDinero> {
               onPressed: () {
                 double monto = double.tryParse(_montoController.text) ?? 0;
                 String concepto = _conceptoController.text;
-                retirarDinero(monto, concepto);
+                retirarDinero();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

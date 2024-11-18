@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'modalExito.dart'; // Componente ModalExito
 
 class IngresarDinero extends StatefulWidget {
@@ -19,34 +23,44 @@ class _IngresarDineroState extends State<IngresarDinero> {
     if (monto != null && monto != 0) {
       try {
         final prefs = await SharedPreferences.getInstance();
-        final idUsuario = prefs.getInt('idUsuario'); // Obtener idUsuario de SharedPreferences
+        final token = prefs.getString('token'); // Obtener el token de SharedPreferences
+
+        if (token == null) {
+          print('Error: token no encontrado');
+          return;
+        }
 
         final response = await http.post(
-          Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/ingreso.php?action=registrarIngreso'),
+          Uri.parse('http://54.159.207.236/ingreso.php?action=registrarIngreso'),
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token', // Asegúrate de incluir el token en las cabeceras
           },
           body: jsonEncode({
-            'idUsuario': idUsuario,
             'concepto': concepto,
             'monto': monto,
           }),
         );
 
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-          if (data['mensaje'] == "Ingreso registrado con éxito") {
+          if (data['mensaje'] == "Ingreso registrado con exito") {
             print("Ingreso registrado con éxito");
             setState(() {
               _montoController.clear();
               _conceptoController.clear();
             });
           } else {
-            print("Error al registrar el ingreso");
+            print("Error al registrar el ingreso respuesta: ${data['mensaje']}");
           }
+        } else {
+          print("Error al registrar el ingreso backend: ${response.statusCode}");
         }
       } catch (error) {
-        print('Error al registrar el ingreso: $error');
+        print('Error al registrar el ingreso app: $error');
       }
     } else {
       print('No hay dinero que ingresar');
@@ -92,9 +106,9 @@ class _IngresarDineroState extends State<IngresarDinero> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                double monto = double.tryParse(_montoController.text) ?? 0;
+                double  monto = double.tryParse(_montoController.text) ?? 0;
                 String concepto = _conceptoController.text;
-                agregarDinero(monto, concepto);
+                agregarDinero();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF61c26a),

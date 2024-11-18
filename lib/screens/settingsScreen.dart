@@ -31,7 +31,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse('https://cashviewer.000webhostapp.com/access/usuario.php?action=mostrarInformacionUsuario'),
+        Uri.parse('http://54.159.207.236/usuario.php?action=mostrarInformacionUsuario'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -40,12 +40,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['mensaje'] == "Información del usuario obtenida con éxito") {
+        if (data['mensaje'] == "Informacion del usuario obtenida con exito") {
           setState(() {
             usuario = data['usuario'];
           });
         } else {
-          print('Inicie sesión');
+          print('Inicie sesion');
         }
       } else {
         throw Exception('Error al hacer la solicitud: ${response.statusCode}');
@@ -71,34 +71,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final idUsuario = prefs.getInt('idUsuario'); // Obtener idUsuario de SharedPreferences
+      final token = prefs.getString('token'); // Obtener el token de SharedPreferences
+
+      if (token == null) {
+        print('Error: token no encontrado');
+        return;
+      }
 
       final response = await http.post(
-        Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/usuario.php?action=actualizarUsuario'),
+        Uri.parse('http://54.159.207.236/usuario.php?action=actualizarUsuario'),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Asegúrate de incluir el token en las cabeceras
         },
         body: jsonEncode({
-          'idUsuario': idUsuario,
           'numeroCelular': numeroCelular,
           'contrasenia': nuevaContrasenia,
         }),
       );
 
+      // print('Response status: ${response.statusCode}');
+      // print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['mensaje'] == "Usuario actualizado con éxito") {
-          print("Usuario modificado con éxito");
+        if (data['mensaje'] == "Usuario actualizado con exito") {
+          print("Usuario modificado con exito");
           Navigator.pop(context); // Cierra el modal
-          fetchUserInfo(); // Actualiza la información del usuario
+          fetchUserInfo(); // Mostrar pantalla de sesion inactiva, volver a iniciar sesion
         } else {
-          print("Error al modificar el usuario");
+          print("Error al modificar el usuario respuesta: ${data['mensaje']}");
         }
+      } else {
+        print("Error al modificar el usuario backend: ${response.statusCode}");
       }
     } catch (error) {
-      print('Error al modificar el usuario: $error');
+      print('Error al modificar el usuario app: $error');
     }
   }
+
 
   void abrirModal() {
     showModalBottomSheet(

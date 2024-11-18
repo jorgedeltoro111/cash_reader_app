@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 class ConsultarSaldo extends StatefulWidget {
   @override
   _ConsultarSaldoState createState() => _ConsultarSaldoState();
@@ -13,38 +17,56 @@ class _ConsultarSaldoState extends State<ConsultarSaldo> {
   @override
   void initState() {
     super.initState();
-    // Aquí se puede llamar la lógica de obtener datos del backend en el futuro
     obtenerDatos();
   }
 
-  // Función temporal para simular la obtención de datos (sin backend)
-  void obtenerDatos() async {
+  Future<void> obtenerDatos() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final idUsuario = prefs.getInt('idUsuario'); // Obtener idUsuario de SharedPreferences
+      final token = prefs.getString('token');
 
-      final response = await http.get(
-        Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/balance.php?action=obtenerBalance'),
-        headers: {
-          'Content-Type': 'application/json',
-          'idUsuario': idUsuario.toString(), // Enviar idUsuario en los headers
-        },
+      if (token == null) {
+        print('Error: token no encontrado');
+        return;
+      }
+
+      final responseBalance = await http.get(
+        Uri.parse('http://54.159.207.236/balance.php?action=obtenerBalance'),
+        headers: {'Authorization': 'Bearer $token'},
       );
+      print('Response Balance: ${responseBalance.body}');
+      final dataBalance = jsonDecode(responseBalance.body);
+      setState(() {
+        saldo = (dataBalance['balance'] as num).toDouble();
+      });
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['mensaje'] == "Balance obtenido con éxito") {
-          setState(() {
-            saldo = data['balance'];
-            ingresos = data['ingresos'] ?? [];
-            gastos = data['gastos'] ?? [];
-          });
-        } else {
-          print("Error al obtener el balance");
-        }
+      final responseIngresos = await http.get(
+        Uri.parse('http://54.159.207.236/ingreso.php?action=obtenerIngresos'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      final dataIngresos = jsonDecode(responseIngresos.body);
+      if (dataIngresos['ingresos'] != null && dataIngresos['ingresos'] is List) {
+        setState(() {
+          ingresos = List<Map<String, dynamic>>.from(dataIngresos['ingresos']);
+        });
+      } else {
+        print('Error: los ingresos devueltos no son un array');
+      }
+
+      final responseGastos = await http.get(
+        Uri.parse('http://54.159.207.236/gasto.php?action=obtenerGastos'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      final dataGastos = jsonDecode(responseGastos.body);
+      if (dataGastos['gastos'] != null && dataGastos['gastos'] is List) {
+        setState(() {
+          gastos = List<Map<String, dynamic>>.from(dataGastos['gastos']);
+        });
+      } else {
+        print('Error: los gastos devueltos no son un array');
       }
     } catch (error) {
-      print('Error al obtener el balance: $error');
+      print('Error al obtener los datos: $error');
     }
   }
 

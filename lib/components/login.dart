@@ -1,11 +1,15 @@
+import 'package:cash_reader_app/components/retirarDinero.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'consultarSaldo.dart';
+
+// import 'package:cash_reader_app/screens/settingsScreen.dart';
+
 class Login extends StatefulWidget {
   final VoidCallback onLogin;
-
   Login({required this.onLogin});
 
   @override
@@ -16,28 +20,85 @@ class _LoginState extends State<Login> {
   TextEditingController numeroCelularController = TextEditingController();
   TextEditingController contraseniaController = TextEditingController();
   bool isModalOpen = false;
-
   void handleButtonPress() async {
+    // Aquí se puede validar la longitud
     final numeroCelular = numeroCelularController.text;
     final contrasenia = contraseniaController.text;
-
+    // Try catch para manejar errores
     try {
       final response = await http.post(
-        Uri.parse('https://lavender-okapi-449526.hostingersite.com/access/usuario.php?action=iniciarSesion'),
+        Uri.parse('http://54.159.207.236/usuario.php?action=iniciarSesion'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'numeroCelular': numeroCelular, 'contrasenia': contrasenia}),
+        body: jsonEncode({ // Se toman los datos ingresados para añadir a la petición
+          'numeroCelular': numeroCelular,
+          'contrasenia': contrasenia,
+        }),
       );
-      final data = jsonDecode(response.body);
 
-      if (data['mensaje'] == "Inicio de sesión exitoso") {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt('idUsuario', data['idUsuario']); // Almacenar idUsuario en SharedPreferences
-        widget.onLogin();
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(data['token']); // Debug
+        if (data['mensaje'] == "Inicio de sesion exitoso") {
+          // Guardar idUsuario y token en SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setInt('idUsuario', data['idUsuario']);
+          prefs.setString('token', data['token']);
+          print('Inicio de sesion exitoso, ID y token guardados en SharedPreferences');
+          print(data['token']);
+
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ConsultarSaldo()));
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => IngresarDinero()));
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => RetirarDinero()));
+
+        } else {
+          print('Error al iniciar sesión token: ${data['mensaje']}');
+        }
       } else {
-        print("Usuario no existe");
+        print('Error al iniciar sesión backend: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error al iniciar sesión: $error');
+      print('Error al iniciar sesión app: $error');
+    }
+  }
+
+  void registrarUsuario() async {
+    final numeroCelular = numeroCelularController.text;
+    final contrasenia = contraseniaController.text;
+    // final confirmarContrasenia = confirmarContraseniaController.text;
+
+    if (numeroCelular.isNotEmpty && contrasenia.isNotEmpty) { // && contrasenia == confirmarContrasenia
+      try {
+        final response = await http.post(
+          Uri.parse('http://54.159.207.236/usuario.php?action=registrarUsuario'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'numeroCelular': numeroCelular,
+            'contrasenia': contrasenia,
+          }),
+        );
+
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['mensaje'] == "Usuario agregado con exito") {
+            print("Usuario registrado con éxito");
+            Navigator.pop(context); // Cierra el modal
+          } else {
+            print("Error al registrar el usuario: ${data['mensaje']}");
+          }
+        } else {
+          print("Error al registrar el usuario backend: ${response.statusCode}");
+        }
+      } catch (error) {
+        print('Error al registrar el usuario app: $error');
+      }
+    } else {
+      print('Los campos no deben estar vacíos y las contraseñas deben coincidir');
     }
   }
 
@@ -89,7 +150,8 @@ class _LoginState extends State<Login> {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    // Lógica para registrar al usuario
+                    registrarUsuario();
+                    print('presionado');
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
@@ -112,6 +174,7 @@ class _LoginState extends State<Login> {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
+                    print('boton presionado');
                     // Lógica para cerrar el modal
                     Navigator.pop(context);
                     isModalOpen = false;
