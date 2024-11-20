@@ -1,14 +1,13 @@
 import 'package:cash_reader_app/components/retirarDinero.dart';
-import 'package:cash_reader_app/screens/financeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'consultarSaldo.dart';
-// import 'ingresarDinero.dart';
+import 'ingresarDinero.dart';
 
-// import 'package:cash_reader_app/screens/settingsScreen.dart';
+import 'package:cash_reader_app/screens/settingsScreen.dart';
 import 'package:cash_reader_app/screens/financeScreen.dart';
 
 class Login extends StatefulWidget {
@@ -22,11 +21,13 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController numeroCelularController = TextEditingController();
   TextEditingController contraseniaController = TextEditingController();
+  TextEditingController confirmarContraseniaController = TextEditingController();
   bool isModalOpen = false;
+
   void handleButtonPress() async {
     // Aquí se puede validar la longitud
-    String numeroCelular = numeroCelularController.text;
-    String contrasenia = contraseniaController.text;
+    final numeroCelular = numeroCelularController.text;
+    final contrasenia = contraseniaController.text;
     // Try catch para manejar errores
     try {
       final response = await http.post(
@@ -42,7 +43,7 @@ class _LoginState extends State<Login> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // print(data['token']); // Debug
+        print(data['token']); // Debug
         if (data['mensaje'] == "Inicio de sesion exitoso") {
           // Guardar idUsuario y token en SharedPreferences
           final prefs = await SharedPreferences.getInstance();
@@ -51,9 +52,9 @@ class _LoginState extends State<Login> {
           print('Inicio de sesion exitoso, ID y token guardados en SharedPreferences');
           print(data['token']);
 
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => FinanceScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => FinanceScreen()));
 
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ConsultarSaldo()));
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => ConsultarSaldo()));
           // Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
           // Navigator.push(context, MaterialPageRoute(builder: (context) => IngresarDinero()));
           // Navigator.push(context, MaterialPageRoute(builder: (context) => RetirarDinero()));
@@ -72,16 +73,16 @@ class _LoginState extends State<Login> {
   void registrarUsuario() async {
     final numeroCelular = numeroCelularController.text;
     final contrasenia = contraseniaController.text;
-    // final confirmarContrasenia = confirmarContraseniaController.text;
+    final confirmarContrasenia = confirmarContraseniaController.text;
 
-    if (numeroCelular.isNotEmpty && contrasenia.isNotEmpty) { // && contrasenia == confirmarContrasenia
+    if (numeroCelular.isNotEmpty && contrasenia.isNotEmpty && contrasenia == confirmarContrasenia) {
       try {
         final response = await http.post(
           Uri.parse('http://54.159.207.236/usuario.php?action=registrarUsuario'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'numeroCelular': numeroCelular,
-            'contrasenia': contrasenia,
+            'contrasenia': confirmarContrasenia,
           }),
         );
 
@@ -127,6 +128,7 @@ class _LoginState extends State<Login> {
                 ),
                 SizedBox(height: 10),
                 TextField(
+                  controller: numeroCelularController,
                   decoration: InputDecoration(
                     hintText: "Ingrese su número telefónico",
                     border: OutlineInputBorder(),
@@ -136,6 +138,7 @@ class _LoginState extends State<Login> {
                 ),
                 SizedBox(height: 15),
                 TextField(
+                  controller: contraseniaController,
                   decoration: InputDecoration(
                     hintText: "Ingrese su contraseña",
                     border: OutlineInputBorder(),
@@ -145,6 +148,7 @@ class _LoginState extends State<Login> {
                 ),
                 SizedBox(height: 15),
                 TextField(
+                  controller: confirmarContraseniaController,
                   decoration: InputDecoration(
                     hintText: "Confirme su contraseña",
                     border: OutlineInputBorder(),
@@ -154,11 +158,7 @@ class _LoginState extends State<Login> {
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
-                    registrarUsuario();
-                    print('presionado');
-                    Navigator.pop(context);
-                  },
+                  onPressed: registrarUsuario,
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(200, 50),
                     padding: EdgeInsets.all(16),
@@ -179,9 +179,6 @@ class _LoginState extends State<Login> {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    registrarUsuario();
-                    // Se cierra antes de que mande la solicitud
-                    print('boton presionado');
                     // Lógica para cerrar el modal
                     Navigator.pop(context);
                     isModalOpen = false;
@@ -198,8 +195,8 @@ class _LoginState extends State<Login> {
                   child: Text(
                       "Cerrar",
                       style: TextStyle(
-                          fontSize: 17,
-                          color: Colors.black,
+                        fontSize: 17,
+                        color: Colors.black,
                       )
                   ),
                 ),
@@ -256,8 +253,8 @@ class _LoginState extends State<Login> {
           child: Text(
               "Ingresar",
               style: TextStyle(
-                  fontSize: 17,
-                  color: Colors.black,
+                fontSize: 17,
+                color: Colors.black,
               )
           ),
         ),
@@ -274,14 +271,15 @@ class _LoginState extends State<Login> {
             ),
           ),
           child: Text(
-              "Registrarse",
-              style: TextStyle(
-                  fontSize: 17,
-                  color: Colors.black,
-              ),
+            "Registrarse",
+            style: TextStyle(
+              fontSize: 17,
+              color: Colors.black,
+            ),
           ),
         ),
       ],
     );
   }
 }
+
