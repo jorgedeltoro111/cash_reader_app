@@ -45,7 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             usuario = data['usuario'];
           });
         } else {
-          print('Inicie sesion');
+          print('Error peticion');
         }
       } else {
         throw Exception('Error al hacer la solicitud: ${response.statusCode}');
@@ -169,6 +169,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
+          // Validación
+        // Login = false, msj linea 195
           : usuario != null
               ? Padding(
                   padding: const EdgeInsets.all(16.0),

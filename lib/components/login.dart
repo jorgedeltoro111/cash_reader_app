@@ -1,12 +1,15 @@
 import 'package:cash_reader_app/components/retirarDinero.dart';
+import 'package:cash_reader_app/screens/financeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'consultarSaldo.dart';
+// import 'ingresarDinero.dart';
 
 // import 'package:cash_reader_app/screens/settingsScreen.dart';
+import 'package:cash_reader_app/screens/financeScreen.dart';
 
 class Login extends StatefulWidget {
   final VoidCallback onLogin;
@@ -22,8 +25,8 @@ class _LoginState extends State<Login> {
   bool isModalOpen = false;
   void handleButtonPress() async {
     // Aquí se puede validar la longitud
-    final numeroCelular = numeroCelularController.text;
-    final contrasenia = contraseniaController.text;
+    String numeroCelular = numeroCelularController.text;
+    String contrasenia = contraseniaController.text;
     // Try catch para manejar errores
     try {
       final response = await http.post(
@@ -39,7 +42,7 @@ class _LoginState extends State<Login> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data['token']); // Debug
+        // print(data['token']); // Debug
         if (data['mensaje'] == "Inicio de sesion exitoso") {
           // Guardar idUsuario y token en SharedPreferences
           final prefs = await SharedPreferences.getInstance();
@@ -47,6 +50,8 @@ class _LoginState extends State<Login> {
           prefs.setString('token', data['token']);
           print('Inicio de sesion exitoso, ID y token guardados en SharedPreferences');
           print(data['token']);
+
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => FinanceScreen()));
 
           Navigator.push(context, MaterialPageRoute(builder: (context) => ConsultarSaldo()));
           // Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
@@ -174,6 +179,8 @@ class _LoginState extends State<Login> {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
+                    registrarUsuario();
+                    // Se cierra antes de que mande la solicitud
                     print('boton presionado');
                     // Lógica para cerrar el modal
                     Navigator.pop(context);

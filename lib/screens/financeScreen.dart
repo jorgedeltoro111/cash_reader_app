@@ -9,7 +9,7 @@ class FinanceScreen extends StatefulWidget {
 }
 
 class _FinanceScreenState extends State<FinanceScreen> {
-  bool isLogin = false;
+  bool isLogin = true;
 
   void onLogin() {
     setState(() {

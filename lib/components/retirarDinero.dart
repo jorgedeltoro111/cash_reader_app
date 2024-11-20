@@ -75,6 +75,7 @@ class _RetirarDineroState extends State<RetirarDinero> {
       }
     } else {
       print('No hay dinero que gastar');
+      // Pop-up
     }
   }
 
