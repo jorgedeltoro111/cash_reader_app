@@ -30,6 +30,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      if (token == null) {
+        throw Exception('Token no encontrado');
+      }
+
       final response = await http.post(
         Uri.parse('http://54.159.207.236/usuario.php?action=mostrarInformacionUsuario'),
         headers: {
@@ -45,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             usuario = data['usuario'];
           });
         } else {
-          print('Error peticion');
+          print('Error en la petición: ${data['mensaje']}');
         }
       } else {
         throw Exception('Error al hacer la solicitud: ${response.statusCode}');
@@ -90,15 +94,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }),
       );
 
-      // print('Response status: ${response.statusCode}');
-      // print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['mensaje'] == "Usuario actualizado con exito") {
           print("Usuario modificado con exito");
           Navigator.pop(context); // Cierra el modal
-          fetchUserInfo(); // Mostrar pantalla de sesion inactiva, volver a iniciar sesion
+          fetchUserInfo(); // Actualiza la información del usuario
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Se ha actualizado su información. Por favor, inicie sesión nuevamente.')),
+          );
         } else {
           print("Error al modificar el usuario respuesta: ${data['mensaje']}");
         }
@@ -109,7 +113,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       print('Error al modificar el usuario app: $error');
     }
   }
-
 
   void abrirModal() {
     showModalBottomSheet(
@@ -158,7 +161,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         );
       },
-    );
+    ).then((_) {
+      fetchUserInfo(); // Actualiza la información del usuario después de cerrar el modal
+    });
   }
 
   @override
@@ -169,30 +174,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          // Validación
-        // Login = false, msj linea 195
           : usuario != null
-              ? Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Información de usuario',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 10),
-                      Text('ID de usuario: ${usuario!['idUsuario']}'),
-                      Text('Número de celular: ${usuario!['numeroCelular']}'),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: abrirModal, // Botón para abrir el modal
-                        child: Text("Cambiar correo y contraseña"),
-                      ),
-                    ],
-                  ),
-                )
-              : Center(child: Text('Inicie sesión para ver la información.')),
+          ? Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Información de usuario',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text('ID de usuario: ${usuario!['idUsuario']}'),
+            Text('Número de celular: ${usuario!['numeroCelular']}'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: abrirModal, // Botón para abrir el modal
+              child: Text("Cambiar correo y contraseña"),
+            ),
+          ],
+        ),
+      )
+          : Center(child: Text('Inicie sesión para ver la información.')),
     );
   }
 }
+

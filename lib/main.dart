@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _widgetOptions = [
     DetectorScreen(), // Pantalla principal con la funcionalidad de detección
     FinanceScreen(),  // Pantalla de finanzas
-    SettingsScreen(), // Pantalla de configuración
+    // SettingsScreen(), // Pantalla de configuración
   ];
 
   @override
@@ -73,10 +73,10 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.attach_money),
             label: 'Finanzas',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Configuración',
-          ),
+          // BottomNavigationBarItem(
+            // icon: Icon(Icons.settings),
+            // label: 'Configuración',
+          // ),
         ],
       ),
     );

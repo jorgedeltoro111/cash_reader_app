@@ -1,3 +1,4 @@
+import 'package:cash_reader_app/screens/settingsScreen.dart';
 import 'package:flutter/material.dart';
 import '../components/login.dart'; // Importa el componente Login
 import '../components/ingresarDinero.dart';
@@ -7,7 +8,7 @@ class FinanceScreen extends StatefulWidget {
   @override
   _FinanceScreenState createState() => _FinanceScreenState();
 }
-
+// Llegaste a la version
 class _FinanceScreenState extends State<FinanceScreen> {
   bool isLogin = true;
 
@@ -96,6 +97,22 @@ class _FinanceScreenState extends State<FinanceScreen> {
                   )
                 ),
               ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 10),
+              child: ElevatedButton(onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+              }, style: ElevatedButton.styleFrom(
+                minimumSize: Size(200, 50),
+                padding: EdgeInsets.all(16),
+                backgroundColor: Colors.purple
+              ), child: Text(
+                'Configuración',
+                style: TextStyle(
+                  fontSize:17,
+                  color: Colors.black,
+                ),
+              )),
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 10),
