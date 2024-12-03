@@ -93,9 +93,49 @@ class _LoginState extends State<Login> {
           final data = json.decode(response.body);
           if (data['mensaje'] == "Usuario agregado con exito") {
             print("Usuario registrado con éxito");
+<<<<<<< HEAD
             Navigator.pop(context); // Cierra el modal
           } else {
             print("Error al registrar el usuario: ${data['mensaje']}");
+=======
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                      title: Text('Exito'),
+                      content: Text('Usuario registrado exitosamente'),
+                      actions: <Widget>[
+                        TextButton(
+                            child: Text('OK'),
+                            onPressed: (){
+                              Navigator.of(context).pop();
+                            }
+                        )
+                      ]
+                  );
+                }
+            );
+            Navigator.pop(context); // Cierra el modal
+          } else {
+            print("Error al registrar el usuario: ${data['mensaje']}");
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                      title: Text('Exito'),
+                      content: Text('Error al registrar al usuario'),
+                      actions: <Widget>[
+                        TextButton(
+                            child: Text('OK'),
+                            onPressed: (){
+                              Navigator.of(context).pop();
+                            }
+                        )
+                      ]
+                  );
+                }
+            );
+>>>>>>> b103f83 (Final version)
           }
         } else {
           print("Error al registrar el usuario backend: ${response.statusCode}");
@@ -104,6 +144,26 @@ class _LoginState extends State<Login> {
         print('Error al registrar el usuario app: $error');
       }
     } else {
+<<<<<<< HEAD
+=======
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text('Atención'),
+                content: Text('Los campos no deben estar vacíos y las contraseñas deben coincidir'),
+                actions: <Widget>[
+                  TextButton(
+                      child: Text('OK'),
+                      onPressed: (){
+                        Navigator.of(context).pop();
+                      }
+                  )
+                ]
+            );
+          }
+      );
+>>>>>>> b103f83 (Final version)
       print('Los campos no deben estar vacíos y las contraseñas deben coincidir');
     }
   }

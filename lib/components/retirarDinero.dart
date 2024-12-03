@@ -60,10 +60,34 @@ class _RetirarDineroState extends State<RetirarDinero> {
           final data = json.decode(response.body);
           if (data['mensaje'] == "Gasto registrado con exito") {
             print("Gasto registrado con éxito");
+<<<<<<< HEAD
             setState(() {
               _montoController.clear();
               _conceptoController.clear();
             });
+=======
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                      title: Text('Exito'),
+                      content: Text('Retiro realizado con éxito'),
+                      actions: <Widget>[
+                        TextButton(
+                            child: Text('OK'),
+                            onPressed: (){
+                              Navigator.of(context).pop();
+                              setState(() {
+                                _montoController.clear();
+                                _conceptoController.clear();
+                              });
+                            }
+                        )
+                      ]
+                  );
+                }
+            );
+>>>>>>> b103f83 (Final version)
           } else {
             print("Error al registrar el gasto respuesta: ${data['mensaje']}");
           }

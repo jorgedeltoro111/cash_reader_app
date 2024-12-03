@@ -49,10 +49,35 @@ class _IngresarDineroState extends State<IngresarDinero> {
           final data = json.decode(response.body);
           if (data['mensaje'] == "Ingreso registrado con exito") {
             print("Ingreso registrado con éxito");
+<<<<<<< HEAD
             setState(() {
               _montoController.clear();
               _conceptoController.clear();
             });
+=======
+            //mostrar un pop al usuario
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Exito'),
+                  content: Text('Ingreso registrado con éxito'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('OK'),
+                      onPressed: (){
+                        Navigator.of(context).pop();
+                        setState(() {
+                          _montoController.clear();
+                          _conceptoController.clear();
+                        });
+                      }
+                    )
+                  ]
+                );
+              }
+            );
+>>>>>>> b103f83 (Final version)
           } else {
             print("Error al registrar el ingreso respuesta: ${data['mensaje']}");
           }
